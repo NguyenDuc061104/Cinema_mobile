@@ -15,7 +15,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridLayout;
-import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -75,6 +74,7 @@ public class MainActivity extends Activity {
     private static final int TAB_NEWS = 2;
     private static final int TAB_MEMBER = 3;
     private int activeTab = TAB_HOME;
+    private int featuredIndex = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -164,45 +164,56 @@ public class MainActivity extends Activity {
         promo.addView(window);
         content.addView(promo);
 
-        addText("Featured Movies", 22, true, Color.WHITE);
+        addText("Featured Movie", 22, true, Color.WHITE);
         if (movies.isEmpty()) {
             addText("No movies found.", 16, false, Color.WHITE);
             return;
         }
-        HorizontalScrollView scroller = new HorizontalScrollView(this);
-        scroller.setHorizontalScrollBarEnabled(false);
-        LinearLayout strip = new LinearLayout(this);
-        strip.setOrientation(LinearLayout.HORIZONTAL);
-        strip.setPadding(0, dp(8), 0, dp(4));
-        int max = Math.min(5, movies.size());
-        for (int i = 0; i < max; i++) {
-            Movie movie = movies.get(i);
-            LinearLayout tile = card();
-            tile.setPadding(dp(8), dp(8), dp(8), dp(8));
-            LinearLayout.LayoutParams tileParams = new LinearLayout.LayoutParams(dp(140), dp(265));
-            tileParams.setMargins(0, 0, dp(14), 0);
-            tile.setLayoutParams(tileParams);
-            ImageView poster = new ImageView(this);
-            poster.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            poster.setBackgroundColor(Color.rgb(18, 21, 62));
-            tile.addView(poster, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(130)));
-            loadImage(movie.posterUrl, poster);
-            TextView movieTitle = text(movie.title, 13, true, Color.WHITE);
-            movieTitle.setMaxLines(2);
-            tile.addView(movieTitle, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(50)));
-            TextView movieGenre = text(movie.genre, 10, false, Color.LTGRAY);
-            movieGenre.setMaxLines(1);
-            tile.addView(movieGenre, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(24)));
-            Button book = button("Book now");
-            book.setTextSize(11);
-            book.setOnClickListener(v -> showMovieDetail(movie.id));
-            LinearLayout.LayoutParams bookParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(36));
-            bookParams.setMargins(0, dp(4), 0, 0);
-            tile.addView(book, bookParams);
-            strip.addView(tile);
-        }
-        scroller.addView(strip);
-        content.addView(scroller);
+
+        if (featuredIndex < 0 || featuredIndex >= movies.size()) featuredIndex = 0;
+        LinearLayout featured = card();
+        featured.setPadding(dp(10), dp(10), dp(10), dp(10));
+
+        LinearLayout controls = new LinearLayout(this);
+        controls.setOrientation(LinearLayout.HORIZONTAL);
+        controls.setGravity(Gravity.CENTER);
+        LinearLayout.LayoutParams controlParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48));
+        controlParams.setMargins(0, 0, 0, dp(10));
+
+        Button previous = button("<");
+        previous.setTextSize(20);
+        Button next = button(">");
+        next.setTextSize(20);
+        TextView counter = text("", 14, true, Color.WHITE);
+        counter.setGravity(Gravity.CENTER);
+        controls.addView(previous, new LinearLayout.LayoutParams(dp(64), dp(44)));
+        controls.addView(counter, new LinearLayout.LayoutParams(0, dp(44), 1));
+        controls.addView(next, new LinearLayout.LayoutParams(dp(64), dp(44)));
+        featured.addView(controls, controlParams);
+
+        ImageView poster = new ImageView(this);
+        poster.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        poster.setAdjustViewBounds(true);
+        poster.setBackgroundColor(Color.rgb(18, 21, 62));
+        featured.addView(poster, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(430)));
+
+        final Runnable[] refreshFeatured = new Runnable[1];
+        refreshFeatured[0] = () -> {
+            Movie current = movies.get(featuredIndex);
+            counter.setText((featuredIndex + 1) + " / " + movies.size());
+            poster.setOnClickListener(v -> showMovieDetail(current.id));
+            loadImage(current.posterUrl, poster);
+        };
+        previous.setOnClickListener(v -> {
+            featuredIndex = (featuredIndex - 1 + movies.size()) % movies.size();
+            refreshFeatured[0].run();
+        });
+        next.setOnClickListener(v -> {
+            featuredIndex = (featuredIndex + 1) % movies.size();
+            refreshFeatured[0].run();
+        });
+        refreshFeatured[0].run();
+        content.addView(featured);
     }
 
     private void showMovies() {
