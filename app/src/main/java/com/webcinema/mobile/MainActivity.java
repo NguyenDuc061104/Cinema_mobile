@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridLayout;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -69,6 +70,12 @@ public class MainActivity extends Activity {
     private int userId = -1;
     private String username;
 
+    private static final int TAB_HOME = 0;
+    private static final int TAB_BUY = 1;
+    private static final int TAB_NEWS = 2;
+    private static final int TAB_MEMBER = 3;
+    private int activeTab = TAB_HOME;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,11 +107,116 @@ public class MainActivity extends Activity {
     }
 
     private void showHome() {
+        activeTab = TAB_HOME;
+        if (movies.isEmpty()) {
+            page("Cinema", false);
+            addLoading("Loading home...");
+            loadHomeMovies();
+        } else {
+            renderHome();
+        }
+    }
+
+    private void loadHomeMovies() {
+        get("/movie/movies", new ApiCallback() {
+            @Override
+            public void ok(String body) {
+                movies.clear();
+                try {
+                    JSONArray arr = new JSONArray(body);
+                    for (int i = 0; i < arr.length(); i++) movies.add(new Movie(arr.getJSONObject(i)));
+                    renderHome();
+                } catch (Exception e) {
+                    showError(e.getMessage());
+                }
+            }
+
+            @Override
+            public void fail(String message) {
+                showError(message);
+            }
+        });
+    }
+
+    private void renderHome() {
+        activeTab = TAB_HOME;
         page("Cinema", false);
-        loadMovies();
+
+        LinearLayout hero = card();
+        TextView logo = text("CINESTAR", 28, true, Color.WHITE);
+        logo.setGravity(Gravity.CENTER);
+        hero.addView(logo);
+        TextView tagline = text("Be happy. Be a star.", 13, false, Color.rgb(221, 213, 238));
+        tagline.setGravity(Gravity.CENTER);
+        hero.addView(tagline);
+        content.addView(hero);
+
+        LinearLayout promo = card();
+        promo.setBackground(tint(Color.rgb(104, 43, 148), dp(8)));
+        TextView happy = text("HAPPY HOUR", 24, true, Color.WHITE);
+        happy.setGravity(Gravity.CENTER);
+        promo.addView(happy);
+        TextView price = text("Tickets from 45K", 34, true, Color.rgb(255, 229, 7));
+        price.setGravity(Gravity.CENTER);
+        promo.addView(price);
+        TextView window = text("Before 10:00 and after 22:00", 14, true, Color.WHITE);
+        window.setGravity(Gravity.CENTER);
+        promo.addView(window);
+        content.addView(promo);
+
+        addText("Featured Movies", 22, true, Color.WHITE);
+        if (movies.isEmpty()) {
+            addText("No movies found.", 16, false, Color.WHITE);
+            return;
+        }
+        HorizontalScrollView scroller = new HorizontalScrollView(this);
+        scroller.setHorizontalScrollBarEnabled(false);
+        LinearLayout strip = new LinearLayout(this);
+        strip.setOrientation(LinearLayout.HORIZONTAL);
+        strip.setPadding(0, dp(8), 0, dp(4));
+        int max = Math.min(5, movies.size());
+        for (int i = 0; i < max; i++) {
+            Movie movie = movies.get(i);
+            LinearLayout tile = card();
+            tile.setPadding(dp(8), dp(8), dp(8), dp(8));
+            LinearLayout.LayoutParams tileParams = new LinearLayout.LayoutParams(dp(140), dp(265));
+            tileParams.setMargins(0, 0, dp(14), 0);
+            tile.setLayoutParams(tileParams);
+            ImageView poster = new ImageView(this);
+            poster.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            poster.setBackgroundColor(Color.rgb(18, 21, 62));
+            tile.addView(poster, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(130)));
+            loadImage(movie.posterUrl, poster);
+            TextView movieTitle = text(movie.title, 13, true, Color.WHITE);
+            movieTitle.setMaxLines(2);
+            tile.addView(movieTitle, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(50)));
+            TextView movieGenre = text(movie.genre, 10, false, Color.LTGRAY);
+            movieGenre.setMaxLines(1);
+            tile.addView(movieGenre, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(24)));
+            Button book = button("Book now");
+            book.setTextSize(11);
+            book.setOnClickListener(v -> showMovieDetail(movie.id));
+            LinearLayout.LayoutParams bookParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(36));
+            bookParams.setMargins(0, dp(4), 0, 0);
+            tile.addView(book, bookParams);
+            strip.addView(tile);
+        }
+        scroller.addView(strip);
+        content.addView(scroller);
+    }
+
+    private void showMovies() {
+        activeTab = TAB_BUY;
+        if (movies.isEmpty()) {
+            page("Buy Tickets", false);
+            loadMovies();
+        } else {
+            renderMovies();
+        }
     }
 
     private void loadMovies() {
+        activeTab = TAB_BUY;
         addLoading("Loading movies...");
         get("/movie/movies", new ApiCallback() {
             @Override
@@ -127,21 +239,16 @@ public class MainActivity extends Activity {
             }
         });
     }
-
     private void renderMovies() {
-        page("Cinema", false);
+        activeTab = TAB_BUY;
+        page("Buy Tickets", false);
         addText("Now Showing", 26, true, Color.WHITE);
-        addText("Book tickets, pick seats, and review your purchases.", 14, false, Color.LTGRAY);
+        addText("Choose a movie, showtime, tickets and seats.", 14, false, Color.LTGRAY);
         LinearLayout actions = new LinearLayout(this);
         actions.setOrientation(LinearLayout.HORIZONTAL);
         Button refresh = button("Refresh");
         refresh.setOnClickListener(v -> loadMovies());
-        actions.addView(refresh, new LinearLayout.LayoutParams(0, dp(44), 1));
-        Button history = button("History");
-        history.setOnClickListener(v -> showHistory());
-        LinearLayout.LayoutParams historyParams = new LinearLayout.LayoutParams(0, dp(44), 1);
-        historyParams.setMargins(dp(8), 0, 0, 0);
-        actions.addView(history, historyParams);
+        actions.addView(refresh, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(38)));
         content.addView(actions);
         if (movies.isEmpty()) {
             addText("No movies found.", 16, false, Color.WHITE);
@@ -180,6 +287,7 @@ public class MainActivity extends Activity {
     }
 
     private void showMovieDetail(int movieId) {
+        activeTab = TAB_BUY;
         page("Movie detail", true);
         addLoading("Loading detail...");
         selectedMovie = null;
@@ -236,6 +344,7 @@ public class MainActivity extends Activity {
     }
 
     private void renderDetail(int restoreScrollY) {
+        activeTab = TAB_BUY;
         page("Movie detail", true, restoreScrollY);
         if (selectedMovie == null) return;
 
@@ -268,7 +377,7 @@ public class MainActivity extends Activity {
             }
             b.setOnClickListener(v -> selectShowtime(s));
             showtimeButtons.put(s.id, b);
-            LinearLayout.LayoutParams showtimeParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(54));
+            LinearLayout.LayoutParams showtimeParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(50));
             showtimeParams.setMargins(0, dp(6), 0, dp(8));
             content.addView(b, showtimeParams);
         }
@@ -637,6 +746,7 @@ public class MainActivity extends Activity {
     }
 
     private void showHistory() {
+        activeTab = TAB_MEMBER;
         if (token == null || userId < 1) {
             toast("Please sign in to view purchase history.");
             showLogin();
@@ -689,6 +799,7 @@ public class MainActivity extends Activity {
     }
 
     private void showProfile() {
+        activeTab = TAB_MEMBER;
         if (token == null || userId < 1) {
             toast("Please sign in to view your profile.");
             showLogin();
@@ -811,6 +922,40 @@ public class MainActivity extends Activity {
         addActionButton(create, dp(18), dp(18));
     }
 
+
+    private void showNews() {
+        activeTab = TAB_NEWS;
+        page("News & Offers", false);
+
+        LinearLayout tabs = new LinearLayout(this);
+        tabs.setOrientation(LinearLayout.HORIZONTAL);
+        Button news = button("News");
+        Button offers = button("Offers");
+        news.setEnabled(false);
+        offers.setTextColor(Color.BLACK);
+        offers.setBackground(tint(Color.rgb(255, 229, 7), dp(8)));
+        tabs.addView(news, new LinearLayout.LayoutParams(0, dp(48), 1));
+        LinearLayout.LayoutParams offerParams = new LinearLayout.LayoutParams(0, dp(48), 1);
+        offerParams.setMargins(dp(8), 0, 0, 0);
+        tabs.addView(offers, offerParams);
+        content.addView(tabs);
+
+        addOfferCard("Happy Hour", "Tickets from 45K", "Special prices before 10:00 and after 22:00.", Color.rgb(119, 42, 162));
+        addOfferCard("C'School", "Student tickets from 45K", "Weekly student and teacher discount with valid ID.", Color.rgb(151, 79, 199));
+        addOfferCard("Member Day", "Earn points on every order", "Use your member account to save purchase history and rewards.", Color.rgb(74, 82, 192));
+    }
+
+    private void addOfferCard(String title, String headline, String body, int color) {
+        LinearLayout card = card();
+        card.setBackground(tint(color, dp(8)));
+        TextView banner = text(title.toUpperCase(Locale.US), 24, true, Color.WHITE);
+        banner.setGravity(Gravity.CENTER);
+        card.addView(banner);
+        TextView price = text(headline, 24, true, Color.rgb(255, 229, 7));
+        card.addView(price);
+        card.addView(text(body, 15, false, Color.WHITE));
+        content.addView(card);
+    }
     private void page(String title, boolean back) {
         page(title, back, -1);
     }
@@ -827,7 +972,10 @@ public class MainActivity extends Activity {
 
         if (back) {
             Button backButton = button("<");
-            backButton.setOnClickListener(v -> showHome());
+            backButton.setOnClickListener(v -> {
+                if (activeTab == TAB_BUY) showMovies();
+                else showHome();
+            });
             bar.addView(backButton, new LinearLayout.LayoutParams(dp(52), dp(44)));
         }
 
@@ -850,12 +998,45 @@ public class MainActivity extends Activity {
         content.setPadding(dp(18), dp(18), dp(18), dp(32));
         scroll.addView(content);
         root.addView(scroll, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1));
+        root.addView(bottomNav());
         setContentView(root);
         if (restoreScrollY >= 0) {
             currentScroll.post(() -> currentScroll.scrollTo(0, restoreScrollY));
         }
     }
 
+
+    private LinearLayout bottomNav() {
+        LinearLayout nav = new LinearLayout(this);
+        nav.setOrientation(LinearLayout.HORIZONTAL);
+        nav.setGravity(Gravity.CENTER);
+        nav.setPadding(dp(4), dp(8), dp(4), dp(10));
+        nav.setBackgroundColor(Color.WHITE);
+        nav.addView(navButton("Home", TAB_HOME, v -> showHome()), new LinearLayout.LayoutParams(0, dp(58), 1));
+        nav.addView(navButton("Buy", TAB_BUY, v -> showMovies()), new LinearLayout.LayoutParams(0, dp(58), 1));
+        nav.addView(navButton("News", TAB_NEWS, v -> showNews()), new LinearLayout.LayoutParams(0, dp(58), 1));
+        nav.addView(navButton("Me", TAB_MEMBER, v -> showProfile()), new LinearLayout.LayoutParams(0, dp(58), 1));
+        return nav;
+    }
+
+
+    private LinearLayout.LayoutParams navItemParams() {
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, dp(58), 1);
+        params.setMargins(dp(2), 0, dp(2), 0);
+        return params;
+    }
+    private Button navButton(String label, int tab, View.OnClickListener listener) {
+        Button b = new Button(this);
+        b.setText(label);
+        b.setAllCaps(false);
+        b.setTextSize(11);
+        b.setGravity(Gravity.CENTER);
+        boolean selected = activeTab == tab;
+        b.setTextColor(selected ? Color.WHITE : Color.rgb(120, 120, 120));
+        b.setBackground(tint(selected ? Color.rgb(112, 43, 150) : Color.WHITE, dp(22)));
+        b.setOnClickListener(listener);
+        return b;
+    }
     private void refreshDetailInPlace() {
         int y = currentScroll == null ? -1 : currentScroll.getScrollY();
         renderDetail(y);
@@ -923,7 +1104,7 @@ public class MainActivity extends Activity {
     }
 
     private void addActionButton(Button button, int top, int bottom) {
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(54));
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(50));
         params.setMargins(0, top, 0, bottom);
         content.addView(button, params);
     }
