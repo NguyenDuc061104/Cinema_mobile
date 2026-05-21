@@ -100,7 +100,7 @@ public class MainActivity extends Activity {
     }
 
     private void showHome() {
-        page("Web Cinema", false);
+        page("Cinema", false);
         loadMovies();
     }
 
@@ -129,7 +129,7 @@ public class MainActivity extends Activity {
     }
 
     private void renderMovies() {
-        page("Web Cinema", false);
+        page("Cinema", false);
         addText("Now Showing", 26, true, Color.WHITE);
         addText("Book tickets, pick seats, and review your purchases.", 14, false, Color.LTGRAY);
         LinearLayout actions = new LinearLayout(this);
@@ -835,7 +835,7 @@ public class MainActivity extends Activity {
         titleView.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
         bar.addView(titleView);
 
-        Button auth = button(token == null ? "Login" : username);
+        Button auth = button(token == null ? "Sign in" : username);
         auth.setOnClickListener(v -> {
             if (token == null) showLogin();
             else showProfile();
