@@ -1021,7 +1021,7 @@ public class MainActivity extends Activity {
         LinearLayout nav = new LinearLayout(this);
         nav.setOrientation(LinearLayout.HORIZONTAL);
         nav.setGravity(Gravity.CENTER);
-        nav.setPadding(dp(6), dp(8), dp(6), dp(10));
+        nav.setPadding(dp(8), dp(6), dp(8), dp(8));
         nav.setBackgroundColor(Color.WHITE);
         nav.addView(navIconButton("Home", R.drawable.home, TAB_HOME, v -> showHome()), navItemParams());
         nav.addView(navIconButton("Buy", R.drawable.tape_measure, TAB_BUY, v -> showMovies()), navItemParams());
@@ -1031,8 +1031,8 @@ public class MainActivity extends Activity {
     }
 
     private LinearLayout.LayoutParams navItemParams() {
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, dp(66), 1);
-        params.setMargins(dp(3), 0, dp(3), 0);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, dp(50), 1);
+        params.setMargins(dp(5), 0, dp(5), 0);
         return params;
     }
 
@@ -1042,25 +1042,21 @@ public class MainActivity extends Activity {
         item.setOrientation(LinearLayout.VERTICAL);
         item.setGravity(Gravity.CENTER);
         item.setClickable(true);
-        item.setPadding(dp(8), dp(5), dp(8), dp(5));
-        item.setBackground(tint(selected ? Color.rgb(112, 43, 150) : Color.WHITE, dp(28)));
+        item.setPadding(dp(8), dp(6), dp(8), dp(6));
+        item.setBackground(tint(selected ? Color.rgb(112, 43, 150) : Color.WHITE, dp(22)));
         item.setOnClickListener(listener);
 
         ImageView icon = new ImageView(this);
         icon.setImageResource(iconRes);
         icon.setColorFilter(selected ? Color.WHITE : Color.rgb(145, 145, 145));
-        LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(dp(26), dp(26));
+        LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(dp(22), dp(22));
         iconParams.setMargins(0, 0, 0, dp(2));
         item.addView(icon, iconParams);
-
-        TextView title = text(label, 10, false, selected ? Color.WHITE : Color.rgb(120, 120, 120));
-        title.setGravity(Gravity.CENTER);
-        item.addView(title, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
         if (selected) {
             item.setScaleX(1f);
             item.setScaleY(1f);
-            item.post(() -> item.animate().scaleX(1.14f).scaleY(1.14f).setDuration(180).start());
+            item.post(() -> item.animate().scaleX(1.08f).scaleY(1.08f).setDuration(180).start());
         }
         return item;
     }
