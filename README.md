@@ -8,6 +8,8 @@ This app connects to the standalone Java backend located in:
 ..\mobile_java_backend
 ```
 
+---
+
 ## Target Device
 
 | Config | Value |
@@ -20,6 +22,8 @@ This app connects to the standalone Java backend located in:
 | targetSdk | 35 |
 | compileSdk | 35 |
 
+---
+
 ## Backend URL
 
 Android Emulator cannot access the host machine using `127.0.0.1`.
@@ -30,12 +34,16 @@ Use:
 http://10.0.2.2:5000
 ```
 
+---
+
 ## Run Backend First
 
 ```powershell
 cd ..\mobile_java_backend
 run_backend.bat
 ```
+
+---
 
 ## Implemented Features
 
@@ -51,6 +59,8 @@ run_backend.bat
 - Payment
 - Ticket creation
 - User profile screen
+
+---
 
 ## API Endpoints
 
@@ -100,6 +110,48 @@ POST /auth/signup
 POST /payment
 ```
 
+---
+
+## Tech Stack
+
+### Android Development
+
+- Java
+- Android SDK
+- Android Studio
+- Gradle
+- Native Android Views
+- RecyclerView
+- ConstraintLayout
+- LinearLayout
+
+### Backend
+
+- Java Backend API
+- RESTful API
+- JSON Response
+
+### Networking
+
+- HttpURLConnection
+- REST API Communication
+- Local Emulator Networking (`10.0.2.2`)
+
+### Architecture
+
+- Activity-based Navigation
+- Session Persistence
+- Modular UI Components
+
+### Tools
+
+- Android Emulator
+- Gradle Build System
+- Git
+- GitHub
+
+---
+
 ## Android Code Structure
 
 ```text
@@ -116,6 +168,20 @@ app/src/main/java/com/webcinema/mobile/
     └── ProfileScreen.java
 ```
 
+---
+
+## Main Files
+
+| File | Description |
+|---|---|
+| `MainActivity.java` | Main navigation and booking flow |
+| `AppConfig.java` | Backend URL and config values |
+| `SessionStore.java` | Login session persistence |
+| `UserProfile.java` | Customer profile response model |
+| `ProfileScreen.java` | Customer profile UI renderer |
+
+---
+
 ## Build With Android Studio
 
 1. Open project in Android Studio
@@ -123,6 +189,8 @@ app/src/main/java/com/webcinema/mobile/
 3. Select `app`
 4. Run emulator
 5. Click Run
+
+---
 
 ## CLI Build
 
@@ -132,11 +200,24 @@ cd android_cinema_app
 gradlew :app:assembleDebug
 ```
 
+---
+
 ## APK Output
 
 ```text
 app/build/outputs/apk/debug/app-debug.apk
 ```
+
+---
+
+## Profile Screen
+
+To open the profile screen:
+
+1. Login successfully
+2. Tap the username button in the top bar
+
+---
 
 ## Notes
 
@@ -144,6 +225,8 @@ app/build/outputs/apk/debug/app-debug.apk
 - Backend must be running before opening the app
 - Native Android Java UI only
 - No external UI libraries used
+
+---
 
 ## Troubleshooting
 
@@ -176,13 +259,37 @@ Wrong:
 http://127.0.0.1:5000
 ```
 
+### App Opens But Data Does Not Load
+
+Check:
+
+- Backend is running
+- API port is `5000`
+- Emulator has internet/network access
+- `AppConfig.java` contains correct backend URL
+
+---
+
 ## Future Improvements
 
 - Booking history
 - QR ticket
+- Movie search
+- Movie filter
 - Dark mode
 - Firebase integration
 - Push notifications
 - JWT authentication
 - Material Design UI
 - Jetpack Compose migration
+
+---
+
+## Author
+
+### Team Members
+
+- Nguyễn An Đức
+- Đoàn Hoài Việt
+
+---
