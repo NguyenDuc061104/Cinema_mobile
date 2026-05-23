@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.InputType;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -79,6 +80,7 @@ public class MainActivity extends Activity {
     private int featuredIndex = 0;
     private final Handler featuredHandler = new Handler(Looper.getMainLooper());
     private Runnable featuredAutoAdvance;
+    private boolean featuredAnimating = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -197,8 +199,9 @@ public class MainActivity extends Activity {
             TextView dot = text("", 1, false, Color.WHITE);
             dot.setBackground(tint(Color.rgb(160, 160, 160), dp(5)));
             dot.setOnClickListener(v -> {
+                int direction = dotIndex >= (featuredIndex % dotViews.length) ? 1 : -1;
                 featuredIndex = dotIndex;
-                refreshHomeFeatured(poster, dotViews);
+                showHomeFeatured(poster, dotViews, direction, true);
                 scheduleFeaturedAutoAdvance(poster, dotViews);
             });
             LinearLayout.LayoutParams dotParams = new LinearLayout.LayoutParams(dp(10), dp(10));
@@ -207,18 +210,35 @@ public class MainActivity extends Activity {
             dotViews[i] = dot;
         }
 
-        poster.setOnClickListener(v -> showMovieDetail(movies.get(featuredIndex).id));
-        refreshHomeFeatured(poster, dotViews);
+        attachHomePosterSwipe(poster, dotViews);
+        showHomeFeatured(poster, dotViews, 0, false);
         scheduleFeaturedAutoAdvance(poster, dotViews);
         content.addView(featured);
     }
 
-    private void refreshHomeFeatured(ImageView poster, TextView[] dotViews) {
-        if (movies.isEmpty()) return;
+    private void showHomeFeatured(ImageView poster, TextView[] dotViews, int direction, boolean animated) {
+        if (movies.isEmpty() || featuredAnimating) return;
         if (featuredIndex < 0 || featuredIndex >= movies.size()) featuredIndex = 0;
         Movie current = movies.get(featuredIndex);
-        poster.setOnClickListener(v -> showMovieDetail(current.id));
-        loadImage(current.posterUrl, poster);
+        updateHomeDots(dotViews);
+        if (!animated) {
+            poster.setTranslationX(0f);
+            poster.setAlpha(1f);
+            loadImage(current.posterUrl, poster);
+            return;
+        }
+        featuredAnimating = true;
+        float exitX = direction >= 0 ? -dp(36) : dp(36);
+        float enterX = direction >= 0 ? dp(36) : -dp(36);
+        poster.animate().translationX(exitX).alpha(0.35f).setDuration(180).withEndAction(() -> {
+            loadImage(current.posterUrl, poster);
+            poster.setTranslationX(enterX);
+            poster.setAlpha(0.35f);
+            poster.animate().translationX(0f).alpha(1f).setDuration(260).withEndAction(() -> featuredAnimating = false).start();
+        }).start();
+    }
+
+    private void updateHomeDots(TextView[] dotViews) {
         int activeDot = featuredIndex % dotViews.length;
         for (int i = 0; i < dotViews.length; i++) {
             boolean selected = i == activeDot;
@@ -230,15 +250,55 @@ public class MainActivity extends Activity {
         }
     }
 
+    private void attachHomePosterSwipe(ImageView poster, TextView[] dotViews) {
+        final float[] startX = new float[1];
+        final float[] startY = new float[1];
+        poster.setOnTouchListener((v, event) -> {
+            if (movies.isEmpty() || featuredAnimating) return true;
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    featuredHandler.removeCallbacksAndMessages(null);
+                    startX[0] = event.getX();
+                    startY[0] = event.getY();
+                    v.animate().cancel();
+                    return true;
+                case MotionEvent.ACTION_MOVE:
+                    float dx = event.getX() - startX[0];
+                    if (Math.abs(dx) > Math.abs(event.getY() - startY[0])) {
+                        v.setTranslationX(dx * 0.35f);
+                    }
+                    return true;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    float releaseDx = event.getX() - startX[0];
+                    float releaseDy = event.getY() - startY[0];
+                    if (Math.abs(releaseDx) < dp(10) && Math.abs(releaseDy) < dp(10)) {
+                        showMovieDetail(movies.get(featuredIndex).id);
+                        return true;
+                    }
+                    if (Math.abs(releaseDx) > dp(55) && Math.abs(releaseDx) > Math.abs(releaseDy)) {
+                        int direction = releaseDx < 0 ? 1 : -1;
+                        featuredIndex = (featuredIndex + direction + movies.size()) % movies.size();
+                        showHomeFeatured(poster, dotViews, direction, true);
+                    } else {
+                        v.animate().translationX(0f).alpha(1f).setDuration(180).start();
+                    }
+                    scheduleFeaturedAutoAdvance(poster, dotViews);
+                    return true;
+            }
+            return true;
+        });
+    }
+
     private void scheduleFeaturedAutoAdvance(ImageView poster, TextView[] dotViews) {
         featuredHandler.removeCallbacksAndMessages(null);
         featuredAutoAdvance = () -> {
             if (activeTab != TAB_HOME || movies.isEmpty()) return;
             featuredIndex = (featuredIndex + 1) % movies.size();
-            refreshHomeFeatured(poster, dotViews);
-            featuredHandler.postDelayed(featuredAutoAdvance, 3000);
+            showHomeFeatured(poster, dotViews, 1, true);
+            featuredHandler.postDelayed(featuredAutoAdvance, 5500);
         };
-        featuredHandler.postDelayed(featuredAutoAdvance, 3000);
+        featuredHandler.postDelayed(featuredAutoAdvance, 5500);
     }
     private void showMovies() {
         activeTab = TAB_BUY;
