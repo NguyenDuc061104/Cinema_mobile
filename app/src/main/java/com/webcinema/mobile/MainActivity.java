@@ -1072,14 +1072,15 @@ public class MainActivity extends Activity {
                 if (activeTab == TAB_BUY) showMovies();
                 else showHome();
             });
-            LinearLayout.LayoutParams backParams = new LinearLayout.LayoutParams(dp(52), dp(44));
-            backParams.setMargins(0, 0, dp(10), 0);
+            LinearLayout.LayoutParams backParams = new LinearLayout.LayoutParams(dp(54), dp(44));
+            backParams.setMargins(0, 0, dp(18), 0);
             bar.addView(backButton, backParams);
         }
 
         TextView titleView = text(title, 21, true, Color.WHITE);
         LinearLayout.LayoutParams titleParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1);
-        titleParams.setMargins(0, 0, dp(8), 0);
+        titleParams.setMargins(0, 0, dp(14), 0);
+        titleView.setPadding(back ? dp(2) : 0, 0, 0, 0);
         titleView.setLayoutParams(titleParams);
         bar.addView(titleView);
 
