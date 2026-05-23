@@ -5,6 +5,8 @@
     <application
         android:allowBackup="true"
         android:label="@string/app_name"
+        android:icon="@drawable/cinema"
+        android:roundIcon="@drawable/cinema"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
         <activity
