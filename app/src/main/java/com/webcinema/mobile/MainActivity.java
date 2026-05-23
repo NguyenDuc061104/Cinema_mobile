@@ -8,6 +8,8 @@ import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.InputType;
 import android.view.Gravity;
 import android.view.View;
@@ -75,6 +77,8 @@ public class MainActivity extends Activity {
     private static final int TAB_MEMBER = 3;
     private int activeTab = TAB_HOME;
     private int featuredIndex = 0;
+    private final Handler featuredHandler = new Handler(Looper.getMainLooper());
+    private Runnable featuredAutoAdvance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -174,48 +178,68 @@ public class MainActivity extends Activity {
         LinearLayout featured = card();
         featured.setPadding(dp(10), dp(10), dp(10), dp(10));
 
-        LinearLayout controls = new LinearLayout(this);
-        controls.setOrientation(LinearLayout.HORIZONTAL);
-        controls.setGravity(Gravity.CENTER);
-        LinearLayout.LayoutParams controlParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48));
-        controlParams.setMargins(0, 0, 0, dp(10));
-
-        Button previous = button("<");
-        previous.setTextSize(20);
-        Button next = button(">");
-        next.setTextSize(20);
-        TextView counter = text("", 14, true, Color.WHITE);
-        counter.setGravity(Gravity.CENTER);
-        controls.addView(previous, new LinearLayout.LayoutParams(dp(64), dp(44)));
-        controls.addView(counter, new LinearLayout.LayoutParams(0, dp(44), 1));
-        controls.addView(next, new LinearLayout.LayoutParams(dp(64), dp(44)));
-        featured.addView(controls, controlParams);
-
         ImageView poster = new ImageView(this);
         poster.setScaleType(ImageView.ScaleType.FIT_CENTER);
         poster.setAdjustViewBounds(true);
         poster.setBackgroundColor(Color.rgb(18, 21, 62));
         featured.addView(poster, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(430)));
 
-        final Runnable[] refreshFeatured = new Runnable[1];
-        refreshFeatured[0] = () -> {
-            Movie current = movies.get(featuredIndex);
-            counter.setText((featuredIndex + 1) + " / " + movies.size());
-            poster.setOnClickListener(v -> showMovieDetail(current.id));
-            loadImage(current.posterUrl, poster);
-        };
-        previous.setOnClickListener(v -> {
-            featuredIndex = (featuredIndex - 1 + movies.size()) % movies.size();
-            refreshFeatured[0].run();
-        });
-        next.setOnClickListener(v -> {
-            featuredIndex = (featuredIndex + 1) % movies.size();
-            refreshFeatured[0].run();
-        });
-        refreshFeatured[0].run();
+        LinearLayout dots = new LinearLayout(this);
+        dots.setOrientation(LinearLayout.HORIZONTAL);
+        dots.setGravity(Gravity.CENTER);
+        LinearLayout.LayoutParams dotsParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(32));
+        dotsParams.setMargins(0, dp(8), 0, 0);
+        featured.addView(dots, dotsParams);
+
+        TextView[] dotViews = new TextView[4];
+        for (int i = 0; i < dotViews.length; i++) {
+            final int dotIndex = i;
+            TextView dot = text("", 1, false, Color.WHITE);
+            dot.setBackground(tint(Color.rgb(160, 160, 160), dp(5)));
+            dot.setOnClickListener(v -> {
+                featuredIndex = dotIndex;
+                refreshHomeFeatured(poster, dotViews);
+                scheduleFeaturedAutoAdvance(poster, dotViews);
+            });
+            LinearLayout.LayoutParams dotParams = new LinearLayout.LayoutParams(dp(10), dp(10));
+            dotParams.setMargins(dp(5), 0, dp(5), 0);
+            dots.addView(dot, dotParams);
+            dotViews[i] = dot;
+        }
+
+        poster.setOnClickListener(v -> showMovieDetail(movies.get(featuredIndex).id));
+        refreshHomeFeatured(poster, dotViews);
+        scheduleFeaturedAutoAdvance(poster, dotViews);
         content.addView(featured);
     }
 
+    private void refreshHomeFeatured(ImageView poster, TextView[] dotViews) {
+        if (movies.isEmpty()) return;
+        if (featuredIndex < 0 || featuredIndex >= movies.size()) featuredIndex = 0;
+        Movie current = movies.get(featuredIndex);
+        poster.setOnClickListener(v -> showMovieDetail(current.id));
+        loadImage(current.posterUrl, poster);
+        int activeDot = featuredIndex % dotViews.length;
+        for (int i = 0; i < dotViews.length; i++) {
+            boolean selected = i == activeDot;
+            dotViews[i].setBackground(tint(selected ? Color.rgb(112, 43, 150) : Color.rgb(170, 170, 170), dp(selected ? 6 : 5)));
+            ViewGroup.LayoutParams params = dotViews[i].getLayoutParams();
+            params.width = dp(selected ? 12 : 9);
+            params.height = dp(selected ? 12 : 9);
+            dotViews[i].setLayoutParams(params);
+        }
+    }
+
+    private void scheduleFeaturedAutoAdvance(ImageView poster, TextView[] dotViews) {
+        featuredHandler.removeCallbacksAndMessages(null);
+        featuredAutoAdvance = () -> {
+            if (activeTab != TAB_HOME || movies.isEmpty()) return;
+            featuredIndex = (featuredIndex + 1) % movies.size();
+            refreshHomeFeatured(poster, dotViews);
+            featuredHandler.postDelayed(featuredAutoAdvance, 3000);
+        };
+        featuredHandler.postDelayed(featuredAutoAdvance, 3000);
+    }
     private void showMovies() {
         activeTab = TAB_BUY;
         if (movies.isEmpty()) {
