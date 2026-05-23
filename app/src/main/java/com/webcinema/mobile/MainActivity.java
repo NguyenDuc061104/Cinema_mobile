@@ -1021,7 +1021,7 @@ public class MainActivity extends Activity {
         LinearLayout nav = new LinearLayout(this);
         nav.setOrientation(LinearLayout.HORIZONTAL);
         nav.setGravity(Gravity.CENTER);
-        nav.setPadding(dp(8), dp(6), dp(8), dp(8));
+        nav.setPadding(dp(10), dp(5), dp(10), dp(7));
         nav.setBackgroundColor(Color.WHITE);
         nav.addView(navIconButton("Home", R.drawable.home, TAB_HOME, v -> showHome()), navItemParams());
         nav.addView(navIconButton("Buy", R.drawable.tape_measure, TAB_BUY, v -> showMovies()), navItemParams());
@@ -1031,8 +1031,8 @@ public class MainActivity extends Activity {
     }
 
     private LinearLayout.LayoutParams navItemParams() {
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, dp(50), 1);
-        params.setMargins(dp(5), 0, dp(5), 0);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, dp(42), 1);
+        params.setMargins(dp(8), 0, dp(8), 0);
         return params;
     }
 
@@ -1042,21 +1042,21 @@ public class MainActivity extends Activity {
         item.setOrientation(LinearLayout.VERTICAL);
         item.setGravity(Gravity.CENTER);
         item.setClickable(true);
-        item.setPadding(dp(8), dp(6), dp(8), dp(6));
-        item.setBackground(tint(selected ? Color.rgb(112, 43, 150) : Color.WHITE, dp(22)));
+        item.setPadding(dp(6), dp(5), dp(6), dp(5));
+        item.setBackground(tint(selected ? Color.rgb(112, 43, 150) : Color.WHITE, dp(18)));
         item.setOnClickListener(listener);
 
         ImageView icon = new ImageView(this);
         icon.setImageResource(iconRes);
         icon.setColorFilter(selected ? Color.WHITE : Color.rgb(145, 145, 145));
-        LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(dp(22), dp(22));
+        LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(dp(18), dp(18));
         iconParams.setMargins(0, 0, 0, dp(2));
         item.addView(icon, iconParams);
 
         if (selected) {
             item.setScaleX(1f);
             item.setScaleY(1f);
-            item.post(() -> item.animate().scaleX(1.08f).scaleY(1.08f).setDuration(180).start());
+            item.post(() -> item.animate().scaleX(1.06f).scaleY(1.06f).setDuration(180).start());
         }
         return item;
     }
