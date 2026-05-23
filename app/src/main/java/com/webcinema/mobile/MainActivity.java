@@ -228,13 +228,12 @@ public class MainActivity extends Activity {
             return;
         }
         featuredAnimating = true;
-        float exitX = direction >= 0 ? -dp(36) : dp(36);
-        float enterX = direction >= 0 ? dp(36) : -dp(36);
-        poster.animate().translationX(exitX).alpha(0.35f).setDuration(180).withEndAction(() -> {
-            loadImage(current.posterUrl, poster);
+        float exitX = direction >= 0 ? -dp(120) : dp(120);
+        float enterX = direction >= 0 ? dp(120) : -dp(120);
+        poster.animate().translationX(exitX).alpha(0f).setDuration(260).withEndAction(() -> {
             poster.setTranslationX(enterX);
-            poster.setAlpha(0.35f);
-            poster.animate().translationX(0f).alpha(1f).setDuration(260).withEndAction(() -> featuredAnimating = false).start();
+            poster.setAlpha(0f);
+            loadImage(current.posterUrl, poster, () -> poster.animate().translationX(0f).alpha(1f).setDuration(360).withEndAction(() -> featuredAnimating = false).start());
         }).start();
     }
 
@@ -265,7 +264,8 @@ public class MainActivity extends Activity {
                 case MotionEvent.ACTION_MOVE:
                     float dx = event.getX() - startX[0];
                     if (Math.abs(dx) > Math.abs(event.getY() - startY[0])) {
-                        v.setTranslationX(dx * 0.35f);
+                        v.getParent().requestDisallowInterceptTouchEvent(true);
+                        v.setTranslationX(dx * 0.85f);
                     }
                     return true;
                 case MotionEvent.ACTION_UP:
@@ -276,12 +276,13 @@ public class MainActivity extends Activity {
                         showMovieDetail(movies.get(featuredIndex).id);
                         return true;
                     }
-                    if (Math.abs(releaseDx) > dp(55) && Math.abs(releaseDx) > Math.abs(releaseDy)) {
+                    v.getParent().requestDisallowInterceptTouchEvent(false);
+                    if (Math.abs(releaseDx) > dp(36) && Math.abs(releaseDx) > Math.abs(releaseDy)) {
                         int direction = releaseDx < 0 ? 1 : -1;
                         featuredIndex = (featuredIndex + direction + movies.size()) % movies.size();
                         showHomeFeatured(poster, dotViews, direction, true);
                     } else {
-                        v.animate().translationX(0f).alpha(1f).setDuration(180).start();
+                        v.animate().translationX(0f).alpha(1f).setDuration(220).start();
                     }
                     scheduleFeaturedAutoAdvance(poster, dotViews);
                     return true;
@@ -1409,6 +1410,10 @@ public class MainActivity extends Activity {
     }
 
     private void loadImage(String url, ImageView imageView) {
+        loadImage(url, imageView, null);
+    }
+
+    private void loadImage(String url, ImageView imageView, Runnable afterSet) {
         if (url == null || url.trim().isEmpty()) return;
         new AsyncTask<String, Void, Bitmap>() {
             @Override
@@ -1424,6 +1429,7 @@ public class MainActivity extends Activity {
             @Override
             protected void onPostExecute(Bitmap bitmap) {
                 if (bitmap != null) imageView.setImageBitmap(bitmap);
+                if (afterSet != null) afterSet.run();
             }
         }.execute(url);
     }
