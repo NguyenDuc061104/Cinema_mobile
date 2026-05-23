@@ -1021,33 +1021,50 @@ public class MainActivity extends Activity {
         LinearLayout nav = new LinearLayout(this);
         nav.setOrientation(LinearLayout.HORIZONTAL);
         nav.setGravity(Gravity.CENTER);
-        nav.setPadding(dp(4), dp(8), dp(4), dp(10));
+        nav.setPadding(dp(6), dp(8), dp(6), dp(10));
         nav.setBackgroundColor(Color.WHITE);
-        nav.addView(navButton("Home", TAB_HOME, v -> showHome()), new LinearLayout.LayoutParams(0, dp(58), 1));
-        nav.addView(navButton("Buy", TAB_BUY, v -> showMovies()), new LinearLayout.LayoutParams(0, dp(58), 1));
-        nav.addView(navButton("News", TAB_NEWS, v -> showNews()), new LinearLayout.LayoutParams(0, dp(58), 1));
-        nav.addView(navButton("Me", TAB_MEMBER, v -> showProfile()), new LinearLayout.LayoutParams(0, dp(58), 1));
+        nav.addView(navIconButton("Home", R.drawable.home, TAB_HOME, v -> showHome()), navItemParams());
+        nav.addView(navIconButton("Buy", R.drawable.tape_measure, TAB_BUY, v -> showMovies()), navItemParams());
+        nav.addView(navIconButton("News", R.drawable.image, TAB_NEWS, v -> showNews()), navItemParams());
+        nav.addView(navIconButton("Me", R.drawable.user, TAB_MEMBER, v -> showProfile()), navItemParams());
         return nav;
     }
 
-
     private LinearLayout.LayoutParams navItemParams() {
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, dp(58), 1);
-        params.setMargins(dp(2), 0, dp(2), 0);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, dp(66), 1);
+        params.setMargins(dp(3), 0, dp(3), 0);
         return params;
     }
-    private Button navButton(String label, int tab, View.OnClickListener listener) {
-        Button b = new Button(this);
-        b.setText(label);
-        b.setAllCaps(false);
-        b.setTextSize(11);
-        b.setGravity(Gravity.CENTER);
+
+    private LinearLayout navIconButton(String label, int iconRes, int tab, View.OnClickListener listener) {
         boolean selected = activeTab == tab;
-        b.setTextColor(selected ? Color.WHITE : Color.rgb(120, 120, 120));
-        b.setBackground(tint(selected ? Color.rgb(112, 43, 150) : Color.WHITE, dp(22)));
-        b.setOnClickListener(listener);
-        return b;
+        LinearLayout item = new LinearLayout(this);
+        item.setOrientation(LinearLayout.VERTICAL);
+        item.setGravity(Gravity.CENTER);
+        item.setClickable(true);
+        item.setPadding(dp(8), dp(5), dp(8), dp(5));
+        item.setBackground(tint(selected ? Color.rgb(112, 43, 150) : Color.WHITE, dp(28)));
+        item.setOnClickListener(listener);
+
+        ImageView icon = new ImageView(this);
+        icon.setImageResource(iconRes);
+        icon.setColorFilter(selected ? Color.WHITE : Color.rgb(145, 145, 145));
+        LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(dp(26), dp(26));
+        iconParams.setMargins(0, 0, 0, dp(2));
+        item.addView(icon, iconParams);
+
+        TextView title = text(label, 10, false, selected ? Color.WHITE : Color.rgb(120, 120, 120));
+        title.setGravity(Gravity.CENTER);
+        item.addView(title, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        if (selected) {
+            item.setScaleX(1f);
+            item.setScaleY(1f);
+            item.post(() -> item.animate().scaleX(1.14f).scaleY(1.14f).setDuration(180).start());
+        }
+        return item;
     }
+
     private void refreshDetailInPlace() {
         int y = currentScroll == null ? -1 : currentScroll.getScrollY();
         renderDetail(y);
