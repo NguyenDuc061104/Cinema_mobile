@@ -1072,11 +1072,15 @@ public class MainActivity extends Activity {
                 if (activeTab == TAB_BUY) showMovies();
                 else showHome();
             });
-            bar.addView(backButton, new LinearLayout.LayoutParams(dp(52), dp(44)));
+            LinearLayout.LayoutParams backParams = new LinearLayout.LayoutParams(dp(52), dp(44));
+            backParams.setMargins(0, 0, dp(10), 0);
+            bar.addView(backButton, backParams);
         }
 
         TextView titleView = text(title, 21, true, Color.WHITE);
-        titleView.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+        LinearLayout.LayoutParams titleParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1);
+        titleParams.setMargins(0, 0, dp(8), 0);
+        titleView.setLayoutParams(titleParams);
         bar.addView(titleView);
 
         Button auth = button(token == null ? "Sign in" : username);
@@ -1084,7 +1088,7 @@ public class MainActivity extends Activity {
             if (token == null) showLogin();
             else showProfile();
         });
-        bar.addView(auth);
+        bar.addView(auth, new LinearLayout.LayoutParams(dp(94), dp(44)));
         root.addView(bar);
 
         ScrollView scroll = new ScrollView(this);
