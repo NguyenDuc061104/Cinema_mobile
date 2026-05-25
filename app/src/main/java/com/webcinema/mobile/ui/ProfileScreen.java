@@ -73,7 +73,17 @@ public class ProfileScreen {
         return root;
     }
 
-
+    private LinearLayout stat(String label, String value) {
+        LinearLayout view = card();
+        view.setGravity(Gravity.CENTER);
+        TextView number = text(value, 18, true, Color.WHITE);
+        number.setGravity(Gravity.CENTER);
+        TextView caption = text(label, 12, false, Color.LTGRAY);
+        caption.setGravity(Gravity.CENTER);
+        view.addView(number);
+        view.addView(caption);
+        return view;
+    }
     private LinearLayout labelValue(String label, String value) {
         LinearLayout row = new LinearLayout(context);
         row.setOrientation(LinearLayout.VERTICAL);
