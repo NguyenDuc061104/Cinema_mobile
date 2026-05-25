@@ -289,7 +289,7 @@ Check:
 
 ### Team Members
 
-- Nguyễn An Đức
-- Đoàn Hoài Việt
+- Nguyễn An Đức - 22520268        
+- Đoàn Hoài Việt - 22521662
 
 ---
