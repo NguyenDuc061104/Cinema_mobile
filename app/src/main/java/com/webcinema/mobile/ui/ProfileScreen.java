@@ -73,13 +73,6 @@ public class ProfileScreen {
         return root;
     }
 
-    private LinearLayout stat(String label, String value) {
-        LinearLayout view = card();
-        view.setPadding(dp(12), dp(12), dp(12), dp(12));
-        view.addView(text(value, 17, true, Color.WHITE));
-        view.addView(text(label, 12, false, Color.LTGRAY));
-        return view;
-    }
 
     private LinearLayout labelValue(String label, String value) {
         LinearLayout row = new LinearLayout(context);
