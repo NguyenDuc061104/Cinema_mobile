@@ -16,6 +16,12 @@ import com.webcinema.mobile.model.UserProfile;
 import java.util.Locale;
 
 public class ProfileScreen {
+    private static final int COLOR_SURFACE = Color.WHITE;
+    private static final int COLOR_TEXT = Color.rgb(18, 24, 48);
+    private static final int COLOR_MUTED = Color.rgb(98, 105, 125);
+    private static final int COLOR_PRIMARY = Color.rgb(118, 44, 168);
+    private static final int COLOR_BORDER = Color.rgb(224, 226, 236);
+    private static final int COLOR_DANGER = Color.rgb(190, 52, 74);
     private final Context context;
 
     public ProfileScreen(Context context) {
@@ -33,15 +39,15 @@ public class ProfileScreen {
 
         TextView avatar = text(initial(profile), 28, true, Color.WHITE);
         avatar.setGravity(Gravity.CENTER);
-        avatar.setBackground(oval(Color.rgb(78, 86, 192)));
+        avatar.setBackground(oval(COLOR_PRIMARY));
         row.addView(avatar, new LinearLayout.LayoutParams(dp(72), dp(72)));
 
         LinearLayout info = new LinearLayout(context);
         info.setOrientation(LinearLayout.VERTICAL);
         info.setPadding(dp(14), 0, 0, 0);
-        info.addView(text(empty(profile.name) ? profile.username : profile.name, 23, true, Color.WHITE));
-        info.addView(text("@" + profile.username, 14, false, Color.LTGRAY));
-        info.addView(text(profile.email, 14, false, Color.LTGRAY));
+        info.addView(text(empty(profile.name) ? profile.username : profile.name, 23, true, COLOR_TEXT));
+        info.addView(text("@" + profile.username, 14, false, COLOR_MUTED));
+        info.addView(text(profile.email, 14, false, COLOR_MUTED));
         row.addView(info, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
         hero.addView(row);
         root.addView(hero);
@@ -67,7 +73,7 @@ public class ProfileScreen {
         root.addView(moviesButton, actionParams(0, dp(10)));
 
         Button logoutButton = button("Sign out");
-        logoutButton.setBackground(tint(Color.rgb(132, 44, 70), dp(8)));
+        logoutButton.setBackground(tint(COLOR_DANGER, dp(8)));
         logoutButton.setOnClickListener(logout);
         root.addView(logoutButton, actionParams(0, dp(18)));
         return root;
@@ -76,10 +82,15 @@ public class ProfileScreen {
     private LinearLayout stat(String label, String value) {
         LinearLayout view = card();
         view.setGravity(Gravity.CENTER);
-        TextView number = text(value, 18, true, Color.WHITE);
+        view.setPadding(dp(8), dp(12), dp(8), dp(12));
+        TextView number = text(value, 13, true, COLOR_PRIMARY);
         number.setGravity(Gravity.CENTER);
-        TextView caption = text(label, 12, false, Color.LTGRAY);
+        number.setSingleLine(true);
+        number.setIncludeFontPadding(false);
+        number.setTextScaleX(0.92f);
+        TextView caption = text(label, 12, false, COLOR_MUTED);
         caption.setGravity(Gravity.CENTER);
+        caption.setSingleLine(true);
         view.addView(number);
         view.addView(caption);
         return view;
@@ -88,8 +99,8 @@ public class ProfileScreen {
         LinearLayout row = new LinearLayout(context);
         row.setOrientation(LinearLayout.VERTICAL);
         row.setPadding(0, dp(8), 0, dp(8));
-        row.addView(text(label, 13, false, Color.LTGRAY));
-        row.addView(text(value, 16, true, Color.WHITE));
+        row.addView(text(label, 13, false, COLOR_MUTED));
+        row.addView(text(value, 16, true, COLOR_TEXT));
         return row;
     }
 
@@ -97,7 +108,7 @@ public class ProfileScreen {
         LinearLayout view = new LinearLayout(context);
         view.setOrientation(LinearLayout.VERTICAL);
         view.setPadding(dp(18), dp(18), dp(18), dp(18));
-        view.setBackground(tint(Color.rgb(37, 42, 99), dp(8)));
+        view.setBackground(tint(COLOR_SURFACE, dp(8)));
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.setMargins(0, dp(10), 0, dp(16));
         view.setLayoutParams(params);
@@ -119,7 +130,7 @@ public class ProfileScreen {
         b.setText(label);
         b.setAllCaps(false);
         b.setTextColor(Color.WHITE);
-        b.setBackground(tint(Color.rgb(78, 86, 192), dp(8)));
+        b.setBackground(tint(COLOR_PRIMARY, dp(8)));
         return b;
     }
 
@@ -139,6 +150,9 @@ public class ProfileScreen {
         GradientDrawable drawable = new GradientDrawable();
         drawable.setColor(color);
         drawable.setCornerRadius(radius);
+        if (color == COLOR_SURFACE) {
+            drawable.setStroke(dp(1), COLOR_BORDER);
+        }
         return drawable;
     }
 

@@ -72,6 +72,17 @@ public class MainActivity extends Activity {
     private int userId = -1;
     private String username;
 
+    private static final int COLOR_BG = Color.rgb(246, 247, 251);
+    private static final int COLOR_SURFACE = Color.WHITE;
+    private static final int COLOR_SURFACE_SOFT = Color.rgb(239, 241, 250);
+    private static final int COLOR_TEXT = Color.rgb(18, 24, 48);
+    private static final int COLOR_MUTED = Color.rgb(98, 105, 125);
+    private static final int COLOR_PRIMARY = Color.rgb(118, 44, 168);
+    private static final int COLOR_PRIMARY_SOFT = Color.rgb(237, 229, 247);
+    private static final int COLOR_ACCENT = Color.rgb(255, 199, 44);
+    private static final int COLOR_ERROR = Color.rgb(196, 44, 58);
+    private static final int COLOR_POSTER_BG = Color.rgb(232, 234, 244);
+    private static final int COLOR_BORDER = Color.rgb(224, 226, 236);
     private static final int TAB_HOME = 0;
     private static final int TAB_BUY = 1;
     private static final int TAB_NEWS = 2;
@@ -157,17 +168,17 @@ public class MainActivity extends Activity {
         LinearLayout.LayoutParams logoParams = new LinearLayout.LayoutParams(dp(210), dp(72));
         logoParams.setMargins(0, 0, 0, dp(10));
         hero.addView(logo, logoParams);
-        TextView tagline = text("Be happy. Be a star.", 17, true, Color.rgb(238, 231, 250));
+        TextView tagline = text("Be happy. Be a star.", 18, true, COLOR_PRIMARY);
         tagline.setGravity(Gravity.CENTER);
         hero.addView(tagline);
         content.addView(hero);
 
         LinearLayout promo = card();
-        promo.setBackground(tint(Color.rgb(104, 43, 148), dp(8)));
+        promo.setBackground(tint(COLOR_PRIMARY, dp(8)));
         TextView happy = text("HAPPY HOUR", 24, true, Color.WHITE);
         happy.setGravity(Gravity.CENTER);
         promo.addView(happy);
-        TextView price = text("Tickets from 45K", 34, true, Color.rgb(255, 229, 7));
+        TextView price = text("Tickets from 45K", 34, true, COLOR_ACCENT);
         price.setGravity(Gravity.CENTER);
         promo.addView(price);
         TextView window = text("Before 10:00 and after 22:00", 14, true, Color.WHITE);
@@ -175,9 +186,9 @@ public class MainActivity extends Activity {
         promo.addView(window);
         content.addView(promo);
 
-        addText("Featured Movie", 22, true, Color.WHITE);
+        addText("Featured Movie", 22, true, COLOR_TEXT);
         if (movies.isEmpty()) {
-            addText("No movies found.", 16, false, Color.WHITE);
+            addText("No movies found.", 16, false, COLOR_MUTED);
             return;
         }
 
@@ -188,7 +199,7 @@ public class MainActivity extends Activity {
         ImageView poster = new ImageView(this);
         poster.setScaleType(ImageView.ScaleType.FIT_CENTER);
         poster.setAdjustViewBounds(true);
-        poster.setBackgroundColor(Color.rgb(18, 21, 62));
+        poster.setBackgroundColor(COLOR_POSTER_BG);
         featured.addView(poster, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(430)));
 
         LinearLayout dots = new LinearLayout(this);
@@ -201,8 +212,8 @@ public class MainActivity extends Activity {
         TextView[] dotViews = new TextView[4];
         for (int i = 0; i < dotViews.length; i++) {
             final int dotIndex = i;
-            TextView dot = text("", 1, false, Color.WHITE);
-            dot.setBackground(tint(Color.rgb(160, 160, 160), dp(5)));
+            TextView dot = text("", 1, false, COLOR_SURFACE);
+            dot.setBackground(tint(COLOR_BORDER, dp(5)));
             dot.setOnClickListener(v -> {
                 int direction = dotIndex >= (featuredIndex % dotViews.length) ? 1 : -1;
                 featuredIndex = dotIndex;
@@ -246,7 +257,7 @@ public class MainActivity extends Activity {
         int activeDot = featuredIndex % dotViews.length;
         for (int i = 0; i < dotViews.length; i++) {
             boolean selected = i == activeDot;
-            dotViews[i].setBackground(tint(selected ? Color.rgb(112, 43, 150) : Color.rgb(170, 170, 170), dp(selected ? 6 : 5)));
+            dotViews[i].setBackground(tint(selected ? COLOR_PRIMARY : COLOR_BORDER, dp(selected ? 6 : 5)));
             ViewGroup.LayoutParams params = dotViews[i].getLayoutParams();
             params.width = dp(selected ? 12 : 9);
             params.height = dp(selected ? 12 : 9);
@@ -343,8 +354,8 @@ public class MainActivity extends Activity {
     private void renderMovies() {
         activeTab = TAB_BUY;
         page("Buy Tickets", false);
-        addText("Now Showing", 26, true, Color.WHITE);
-        addText("Choose a movie, showtime, tickets and seats.", 14, false, Color.LTGRAY);
+        addText("Now Showing", 26, true, COLOR_TEXT);
+        addText("Choose a movie, showtime, tickets and seats.", 14, false, COLOR_MUTED);
         LinearLayout actions = new LinearLayout(this);
         actions.setOrientation(LinearLayout.HORIZONTAL);
         Button refresh = button("Refresh");
@@ -352,7 +363,7 @@ public class MainActivity extends Activity {
         actions.addView(refresh, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(38)));
         content.addView(actions);
         if (movies.isEmpty()) {
-            addText("No movies found.", 16, false, Color.WHITE);
+            addText("No movies found.", 16, false, COLOR_MUTED);
             return;
         }
 
@@ -365,7 +376,7 @@ public class MainActivity extends Activity {
             ImageView poster = new ImageView(this);
             LinearLayout.LayoutParams posterParams = new LinearLayout.LayoutParams(dp(92), dp(138));
             poster.setLayoutParams(posterParams);
-            poster.setBackgroundColor(Color.rgb(18, 21, 62));
+            poster.setBackgroundColor(COLOR_POSTER_BG);
             poster.setScaleType(ImageView.ScaleType.FIT_CENTER);
             row.addView(poster);
             loadImage(movie.posterUrl, poster);
@@ -374,9 +385,9 @@ public class MainActivity extends Activity {
             info.setOrientation(LinearLayout.VERTICAL);
             info.setPadding(dp(12), 0, 0, 0);
             info.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
-            info.addView(text(movie.title, 19, true, Color.WHITE));
-            info.addView(text(movie.genre + " | " + movie.country, 13, false, Color.LTGRAY));
-            info.addView(text(movie.duration + " min | " + movie.ageRating, 13, false, Color.LTGRAY));
+            info.addView(text(movie.title, 19, true, COLOR_TEXT));
+            info.addView(text(movie.genre + " | " + movie.country, 13, false, COLOR_MUTED));
+            info.addView(text(movie.duration + " min | " + movie.ageRating, 13, false, COLOR_MUTED));
             Button detail = button("Detail / book");
             detail.setOnClickListener(v -> showMovieDetail(movie.id));
             info.addView(detail);
@@ -451,30 +462,30 @@ public class MainActivity extends Activity {
 
         LinearLayout header = card();
         ImageView poster = new ImageView(this);
-        poster.setBackgroundColor(Color.rgb(18, 21, 62));
+        poster.setBackgroundColor(COLOR_POSTER_BG);
         poster.setScaleType(ImageView.ScaleType.FIT_CENTER);
         LinearLayout.LayoutParams posterParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(260));
         posterParams.setMargins(0, 0, 0, dp(10));
         header.addView(poster, posterParams);
         loadImage(selectedMovie.posterUrl, poster);
-        TextView title = text(selectedMovie.title, 24, true, Color.WHITE);
+        TextView title = text(selectedMovie.title, 24, true, COLOR_TEXT);
         header.addView(title);
-        header.addView(text(selectedMovie.genre + " | " + selectedMovie.country + " | " + selectedMovie.duration + " min", 14, false, Color.LTGRAY));
-        header.addView(text("Language: " + selectedMovie.language + " | Age: " + selectedMovie.ageRating, 14, false, Color.LTGRAY));
-        header.addView(text(selectedMovie.description, 14, false, Color.WHITE));
+        header.addView(text(selectedMovie.genre + " | " + selectedMovie.country + " | " + selectedMovie.duration + " min", 14, false, COLOR_MUTED));
+        header.addView(text("Language: " + selectedMovie.language + " | Age: " + selectedMovie.ageRating, 14, false, COLOR_MUTED));
+        header.addView(text(selectedMovie.description, 14, false, COLOR_TEXT));
         content.addView(header);
 
         showtimeButtons.clear();
-        addText("Showtimes", 22, true, Color.WHITE);
+        addText("Showtimes", 22, true, COLOR_TEXT);
         if (showtimes.isEmpty()) {
-            addText("There are currently no showtimes.", 15, false, Color.LTGRAY);
+            addText("There are currently no showtimes.", 15, false, COLOR_MUTED);
             return;
         }
         for (Showtime s : showtimes) {
             Button b = button(s.startTime + "  " + s.room);
             if (selectedShowtime != null && selectedShowtime.id.equals(s.id)) {
-                b.setTextColor(Color.BLACK);
-                b.setBackground(tint(Color.rgb(255, 229, 7), dp(8)));
+                b.setTextColor(COLOR_TEXT);
+                b.setBackground(tint(COLOR_ACCENT, dp(8)));
             }
             b.setOnClickListener(v -> selectShowtime(s));
             showtimeButtons.put(s.id, b);
@@ -512,8 +523,8 @@ public class MainActivity extends Activity {
             Button button = showtimeButtons.get(s.id);
             if (button == null) continue;
             boolean selected = selectedShowtime != null && selectedShowtime.id.equals(s.id);
-            button.setTextColor(selected ? Color.BLACK : Color.WHITE);
-            button.setBackground(tint(selected ? Color.rgb(255, 229, 7) : Color.rgb(78, 86, 192), dp(8)));
+            button.setTextColor(selected ? COLOR_TEXT : Color.WHITE);
+            button.setBackground(tint(selected ? COLOR_ACCENT : COLOR_PRIMARY, dp(8)));
         }
     }
 
@@ -623,22 +634,22 @@ public class MainActivity extends Activity {
 
         if (bookingLoadsPending > 0) {
             LinearLayout loading = card();
-            loading.addView(text("Loading booking options...", 16, false, Color.WHITE));
+            loading.addView(text("Loading booking options...", 16, false, COLOR_MUTED));
             target.addView(loading);
             return;
         }
 
         if (selectedCinema != null) {
             LinearLayout cinemaCard = card();
-            cinemaCard.addView(text("Cinema", 20, true, Color.WHITE));
-            cinemaCard.addView(text(selectedCinema.optString("name"), 16, true, Color.rgb(255, 229, 7)));
-            cinemaCard.addView(text(selectedCinema.optString("address"), 14, false, Color.WHITE));
-            cinemaCard.addView(text(selectedCinema.optString("phone"), 14, false, Color.LTGRAY));
+            cinemaCard.addView(text("Cinema", 20, true, COLOR_TEXT));
+            cinemaCard.addView(text(selectedCinema.optString("name"), 16, true, COLOR_PRIMARY));
+            cinemaCard.addView(text(selectedCinema.optString("address"), 14, false, COLOR_TEXT));
+            cinemaCard.addView(text(selectedCinema.optString("phone"), 14, false, COLOR_MUTED));
             target.addView(cinemaCard);
         }
 
         LinearLayout ticketCard = card();
-        ticketCard.addView(text("Tickets", 22, true, Color.WHITE));
+        ticketCard.addView(text("Tickets", 22, true, COLOR_TEXT));
         for (TicketType type : ticketTypes) {
             TextView[] countRef = new TextView[1];
             LinearLayout row = qtyRow(type.name + " - " + money(type.price), type.quantity,
@@ -657,13 +668,13 @@ public class MainActivity extends Activity {
         target.addView(ticketCard);
 
         LinearLayout seatCard = card();
-        seatCard.addView(text("Seats", 22, true, Color.WHITE));
-        seatSummaryView = text(selectedSeatIds.size() + "/" + totalTicketCount() + " selected", 14, false, Color.LTGRAY);
+        seatCard.addView(text("Seats", 22, true, COLOR_TEXT));
+        seatSummaryView = text(selectedSeatIds.size() + "/" + totalTicketCount() + " selected", 14, false, COLOR_MUTED);
         seatCard.addView(seatSummaryView);
 
-        TextView screen = text("SCREEN", 12, true, Color.BLACK);
+        TextView screen = text("SCREEN", 12, true, COLOR_TEXT);
         screen.setGravity(Gravity.CENTER);
-        screen.setBackground(tint(Color.rgb(255, 229, 7), dp(4)));
+        screen.setBackground(tint(COLOR_ACCENT, dp(4)));
         LinearLayout.LayoutParams screenParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(26));
         screenParams.setMargins(0, dp(12), 0, dp(14));
         seatCard.addView(screen, screenParams);
@@ -692,7 +703,7 @@ public class MainActivity extends Activity {
         target.addView(seatCard);
 
         LinearLayout comboCard = card();
-        comboCard.addView(text("Combos", 22, true, Color.WHITE));
+        comboCard.addView(text("Combos", 22, true, COLOR_TEXT));
         for (Combo combo : combos) {
             TextView[] countRef = new TextView[1];
             LinearLayout row = qtyRow(combo.name + " - " + money(combo.price), combo.quantity,
@@ -710,7 +721,7 @@ public class MainActivity extends Activity {
         target.addView(comboCard);
 
         LinearLayout checkout = card();
-        totalSummaryView = text("Total: " + money(totalPrice()), 22, true, Color.rgb(255, 229, 7));
+        totalSummaryView = text("Total: " + money(totalPrice()), 22, true, COLOR_PRIMARY);
         checkout.addView(totalSummaryView);
         Button pay = button("Checkout");
         pay.setOnClickListener(v -> showCheckout());
@@ -739,8 +750,8 @@ public class MainActivity extends Activity {
             boolean selected = selectedSeatIds.contains(seat.id);
             boolean booked = "booked".equalsIgnoreCase(seat.type);
             button.setEnabled(!booked);
-            button.setBackground(tint(selected ? Color.rgb(255, 229, 7) : seatColor(seat), dp(6)));
-            button.setTextColor(selected ? Color.BLACK : Color.WHITE);
+            button.setBackground(tint(selected ? COLOR_ACCENT : seatColor(seat), dp(6)));
+            button.setTextColor(selected ? COLOR_TEXT : seatTextColor(seat));
         }
         if (totalSummaryView != null) {
             totalSummaryView.setText("Total: " + money(totalPrice()));
@@ -772,13 +783,13 @@ public class MainActivity extends Activity {
 
         page("Checkout", true);
         LinearLayout summary = card();
-        summary.addView(text(selectedMovie.title, 24, true, Color.rgb(255, 229, 7)));
-        summary.addView(text(selectedCinema == null ? "" : selectedCinema.optString("name"), 16, false, Color.WHITE));
-        summary.addView(text(selectedShowtime.startTime + " | " + selectedShowtime.room, 15, false, Color.WHITE));
-        summary.addView(text("Tickets: " + ticketCount, 15, false, Color.WHITE));
-        summary.addView(text("Seats: " + selectedSeatLabels(), 15, false, Color.WHITE));
-        summary.addView(text("Combos: " + selectedComboLabels(), 15, false, Color.WHITE));
-        summary.addView(text("Total: " + money(totalPrice()), 24, true, Color.rgb(255, 229, 7)));
+        summary.addView(text(selectedMovie.title, 24, true, COLOR_PRIMARY));
+        summary.addView(text(selectedCinema == null ? "" : selectedCinema.optString("name"), 16, false, COLOR_TEXT));
+        summary.addView(text(selectedShowtime.startTime + " | " + selectedShowtime.room, 15, false, COLOR_TEXT));
+        summary.addView(text("Tickets: " + ticketCount, 15, false, COLOR_TEXT));
+        summary.addView(text("Seats: " + selectedSeatLabels(), 15, false, COLOR_TEXT));
+        summary.addView(text("Combos: " + selectedComboLabels(), 15, false, COLOR_TEXT));
+        summary.addView(text("Total: " + money(totalPrice()), 24, true, COLOR_PRIMARY));
         content.addView(summary);
 
         Button pay = button("Pay now");
@@ -879,9 +890,9 @@ public class MainActivity extends Activity {
 
     private void renderHistory() {
         page("History", true);
-        addText("Purchase History", 25, true, Color.WHITE);
+        addText("Purchase History", 25, true, COLOR_TEXT);
         if (orders.isEmpty()) {
-            addText("No purchases yet.", 16, false, Color.LTGRAY);
+            addText("No purchases yet.", 16, false, COLOR_MUTED);
             Button browse = button("Browse movies");
             browse.setOnClickListener(v -> showHome());
             addActionButton(browse, dp(18), dp(8));
@@ -889,12 +900,12 @@ public class MainActivity extends Activity {
         }
         for (Order order : orders) {
             LinearLayout card = card();
-            card.addView(text(order.movie, 20, true, Color.rgb(255, 229, 7)));
-            card.addView(text(order.cinema, 14, false, Color.WHITE));
-            card.addView(text(order.showtime + " | " + order.room, 14, false, Color.LTGRAY));
-            card.addView(text("Seats: " + order.seats, 14, false, Color.WHITE));
-            card.addView(text("Paid: " + money(order.amount), 18, true, Color.WHITE));
-            card.addView(text("Created: " + order.createdAt, 12, false, Color.LTGRAY));
+            card.addView(text(order.movie, 20, true, COLOR_PRIMARY));
+            card.addView(text(order.cinema, 14, false, COLOR_TEXT));
+            card.addView(text(order.showtime + " | " + order.room, 14, false, COLOR_MUTED));
+            card.addView(text("Seats: " + order.seats, 14, false, COLOR_TEXT));
+            card.addView(text("Paid: " + money(order.amount), 18, true, COLOR_TEXT));
+            card.addView(text("Created: " + order.createdAt, 12, false, COLOR_MUTED));
             content.addView(card);
         }
     }
@@ -1033,17 +1044,17 @@ public class MainActivity extends Activity {
         Button news = button("News");
         Button offers = button("Offers");
         news.setEnabled(false);
-        offers.setTextColor(Color.BLACK);
-        offers.setBackground(tint(Color.rgb(255, 229, 7), dp(8)));
+        offers.setTextColor(COLOR_TEXT);
+        offers.setBackground(tint(COLOR_ACCENT, dp(8)));
         tabs.addView(news, new LinearLayout.LayoutParams(0, dp(48), 1));
         LinearLayout.LayoutParams offerParams = new LinearLayout.LayoutParams(0, dp(48), 1);
         offerParams.setMargins(dp(8), 0, 0, 0);
         tabs.addView(offers, offerParams);
         content.addView(tabs);
 
-        addOfferCard("Happy Hour", "Tickets from 45K", "Special prices before 10:00 and after 22:00.", Color.rgb(119, 42, 162));
-        addOfferCard("C'School", "Student tickets from 45K", "Weekly student and teacher discount with valid ID.", Color.rgb(151, 79, 199));
-        addOfferCard("Member Day", "Earn points on every order", "Use your member account to save purchase history and rewards.", Color.rgb(74, 82, 192));
+        addOfferCard("Happy Hour", "Tickets from 45K", "Special prices before 10:00 and after 22:00.", COLOR_PRIMARY);
+        addOfferCard("C'School", "Student tickets from 45K", "Weekly student and teacher discount with valid ID.", Color.rgb(139, 91, 190));
+        addOfferCard("Member Day", "Earn points on every order", "Use your member account to save purchase history and rewards.", Color.rgb(82, 99, 184));
     }
 
     private void addOfferCard(String title, String headline, String body, int color) {
@@ -1052,7 +1063,7 @@ public class MainActivity extends Activity {
         TextView banner = text(title.toUpperCase(Locale.US), 24, true, Color.WHITE);
         banner.setGravity(Gravity.CENTER);
         card.addView(banner);
-        TextView price = text(headline, 24, true, Color.rgb(255, 229, 7));
+        TextView price = text(headline, 24, true, COLOR_ACCENT);
         card.addView(price);
         card.addView(text(body, 15, false, Color.WHITE));
         content.addView(card);
@@ -1064,12 +1075,12 @@ public class MainActivity extends Activity {
     private void page(String title, boolean back, int restoreScrollY) {
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(Color.rgb(5, 7, 47));
+        root.setBackgroundColor(COLOR_BG);
 
         LinearLayout bar = new LinearLayout(this);
         bar.setGravity(Gravity.CENTER_VERTICAL);
         bar.setPadding(dp(12), dp(12), dp(12), dp(8));
-        bar.setBackgroundColor(Color.rgb(10, 13, 58));
+        bar.setBackgroundColor(COLOR_SURFACE);
 
         if (back) {
             Button backButton = button("<");
@@ -1082,7 +1093,7 @@ public class MainActivity extends Activity {
             bar.addView(backButton, backParams);
         }
 
-        TextView titleView = text(title, 21, true, Color.WHITE);
+        TextView titleView = text(title, 21, true, COLOR_TEXT);
         LinearLayout.LayoutParams titleParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1);
         titleParams.setMargins(0, 0, dp(14), 0);
         titleView.setPadding(back ? dp(2) : 0, 0, 0, 0);
@@ -1117,7 +1128,7 @@ public class MainActivity extends Activity {
         nav.setOrientation(LinearLayout.HORIZONTAL);
         nav.setGravity(Gravity.CENTER);
         nav.setPadding(dp(10), dp(5), dp(10), dp(7));
-        nav.setBackgroundColor(Color.WHITE);
+        nav.setBackgroundColor(COLOR_SURFACE);
         nav.addView(navIconButton("Home", R.drawable.home, TAB_HOME, v -> showHome()), navItemParams());
         nav.addView(navIconButton("Buy", R.drawable.tape_measure, TAB_BUY, v -> showMovies()), navItemParams());
         nav.addView(navIconButton("News", R.drawable.image, TAB_NEWS, v -> showNews()), navItemParams());
@@ -1138,12 +1149,12 @@ public class MainActivity extends Activity {
         item.setGravity(Gravity.CENTER);
         item.setClickable(true);
         item.setPadding(dp(6), dp(5), dp(6), dp(5));
-        item.setBackground(tint(selected ? Color.rgb(112, 43, 150) : Color.WHITE, dp(18)));
+        item.setBackground(tint(selected ? COLOR_PRIMARY : COLOR_SURFACE, dp(18)));
         item.setOnClickListener(listener);
 
         ImageView icon = new ImageView(this);
         icon.setImageResource(iconRes);
-        icon.setColorFilter(selected ? Color.WHITE : Color.rgb(145, 145, 145));
+        icon.setColorFilter(selected ? Color.WHITE : COLOR_MUTED);
         LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(dp(18), dp(18));
         iconParams.setMargins(0, 0, 0, dp(2));
         item.addView(icon, iconParams);
@@ -1165,7 +1176,7 @@ public class MainActivity extends Activity {
         LinearLayout view = new LinearLayout(this);
         view.setOrientation(LinearLayout.VERTICAL);
         view.setPadding(dp(18), dp(18), dp(18), dp(18));
-        view.setBackground(tint(Color.rgb(37, 42, 99), dp(8)));
+        view.setBackground(tint(COLOR_SURFACE, dp(8)));
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.setMargins(0, dp(12), 0, dp(18));
         view.setLayoutParams(params);
@@ -1177,13 +1188,13 @@ public class MainActivity extends Activity {
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setGravity(Gravity.CENTER_VERTICAL);
         row.setPadding(0, dp(10), 0, dp(10));
-        TextView name = text(label, 15, true, Color.WHITE);
+        TextView name = text(label, 15, true, COLOR_TEXT);
         name.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
         row.addView(name);
         Button m = button("-");
         m.setOnClickListener(v -> minus.run());
         row.addView(m, new LinearLayout.LayoutParams(dp(44), dp(44)));
-        TextView count = text(String.valueOf(qty), 18, true, Color.WHITE);
+        TextView count = text(String.valueOf(qty), 18, true, COLOR_TEXT);
         count.setGravity(Gravity.CENTER);
         if (countRef != null && countRef.length > 0) countRef[0] = count;
         row.addView(count, new LinearLayout.LayoutParams(dp(46), dp(44)));
@@ -1212,7 +1223,7 @@ public class MainActivity extends Activity {
         b.setText(label);
         b.setAllCaps(false);
         b.setTextColor(Color.WHITE);
-        b.setBackground(tint(Color.rgb(78, 86, 192), dp(8)));
+        b.setBackground(tint(COLOR_PRIMARY, dp(8)));
         return b;
     }
 
@@ -1231,11 +1242,11 @@ public class MainActivity extends Activity {
     private EditText input(String hint, boolean password) {
         EditText edit = new EditText(this);
         edit.setHint(hint);
-        edit.setHintTextColor(Color.GRAY);
-        edit.setTextColor(Color.WHITE);
+        edit.setHintTextColor(COLOR_MUTED);
+        edit.setTextColor(COLOR_TEXT);
         edit.setSingleLine(true);
         edit.setPadding(dp(12), 0, dp(12), 0);
-        edit.setBackground(tint(Color.rgb(22, 26, 74), dp(8)));
+        edit.setBackground(tint(COLOR_SURFACE_SOFT, dp(8)));
         if (password) {
             edit.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         }
@@ -1249,6 +1260,9 @@ public class MainActivity extends Activity {
         GradientDrawable drawable = new GradientDrawable();
         drawable.setColor(color);
         drawable.setCornerRadius(radius);
+        if (color == COLOR_SURFACE || color == COLOR_SURFACE_SOFT) {
+            drawable.setStroke(dp(1), COLOR_BORDER);
+        }
         return drawable;
     }
 
@@ -1258,12 +1272,12 @@ public class MainActivity extends Activity {
 
     private void addLoading(String message) {
         content.removeAllViews();
-        addText(message, 16, false, Color.WHITE);
+        addText(message, 16, false, COLOR_MUTED);
     }
 
     private void showError(String message) {
         toast(message);
-        addText(message, 14, false, Color.rgb(255, 120, 120));
+        addText(message, 14, false, COLOR_ERROR);
     }
 
     private void toast(String message) {
@@ -1271,9 +1285,15 @@ public class MainActivity extends Activity {
     }
 
     private int seatColor(Seat seat) {
-        if ("booked".equalsIgnoreCase(seat.type)) return Color.rgb(150, 34, 45);
-        if ("vip".equalsIgnoreCase(seat.type)) return Color.rgb(112, 62, 190);
-        return Color.rgb(77, 84, 115);
+        if ("booked".equalsIgnoreCase(seat.type)) return Color.rgb(248, 199, 205);
+        if ("vip".equalsIgnoreCase(seat.type)) return Color.rgb(139, 91, 190);
+        return Color.rgb(225, 229, 239);
+    }
+
+    private int seatTextColor(Seat seat) {
+        if ("booked".equalsIgnoreCase(seat.type)) return Color.rgb(142, 35, 52);
+        if ("vip".equalsIgnoreCase(seat.type)) return Color.WHITE;
+        return COLOR_TEXT;
     }
 
     private int totalTicketCount() {
