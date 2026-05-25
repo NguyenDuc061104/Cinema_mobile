@@ -149,10 +149,15 @@ public class MainActivity extends Activity {
         page("Cinema", false);
 
         LinearLayout hero = card();
-        TextView logo = text("CINESTAR", 28, true, Color.WHITE);
-        logo.setGravity(Gravity.CENTER);
-        hero.addView(logo);
-        TextView tagline = text("Be happy. Be a star.", 13, false, Color.rgb(221, 213, 238));
+        hero.setGravity(Gravity.CENTER_HORIZONTAL);
+        ImageView logo = new ImageView(this);
+        logo.setImageResource(getResources().getIdentifier("star", "drawable", getPackageName()));
+        logo.setAdjustViewBounds(true);
+        logo.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        LinearLayout.LayoutParams logoParams = new LinearLayout.LayoutParams(dp(210), dp(72));
+        logoParams.setMargins(0, 0, 0, dp(10));
+        hero.addView(logo, logoParams);
+        TextView tagline = text("Be happy. Be a star.", 17, true, Color.rgb(238, 231, 250));
         tagline.setGravity(Gravity.CENTER);
         hero.addView(tagline);
         content.addView(hero);
